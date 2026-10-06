@@ -121,7 +121,7 @@
     -webkit-mask-size:contain; mask-size:contain;
   }
   .crest-gold{
-    background-color:#F3EAD8;
+    background-color:#2B3729; transition:background-color 1.2s ease;
     -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
     -webkit-mask-position:center; mask-position:center;
     -webkit-mask-size:contain; mask-size:contain;
@@ -381,6 +381,7 @@
   .gate-status{min-height:20px; color:var(--wine); font-size:14px; margin-bottom:6px;}
   body.gate-locked #siteMain, body.gate-locked nav, body.gate-locked footer{display:none;}
   /* ---------- optional custom background photo (manager upload) ---------- */
+  .hero.has-photo .crest-gold, #inviteGate.has-photo .crest-gold{background-color:#F3EAD8;}
   .bg-fade-layer{position:absolute; inset:0; background-size:cover; background-position:center; background-repeat:no-repeat; opacity:0; pointer-events:none; z-index:0;}
   .hero > *:not(.bg-fade-layer), #inviteGate > *:not(.bg-fade-layer){position:relative; z-index:1;}
   #inviteGate.has-photo, .hero.has-photo{background-size:cover; background-position:center; background-repeat:no-repeat;}
