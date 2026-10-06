@@ -1179,13 +1179,13 @@ window.gasPostBody = function(params){
       reader.onload = function(e){
         var img = new Image();
         img.onload = function(){
-          var maxDim = 1280;
+          var maxDim = 2400;
           var scale = Math.min(1, maxDim / Math.max(img.width, img.height));
           var w = Math.round(img.width * scale), h = Math.round(img.height * scale);
           var canvas = document.createElement('canvas');
           canvas.width = w; canvas.height = h;
           canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', 0.75));
+          resolve(canvas.toDataURL('image/jpeg', 0.92));
         };
         img.onerror = function(){ reject(new Error('Could not read that image.')); };
         img.src = e.target.result;
@@ -1219,7 +1219,7 @@ window.gasPostBody = function(params){
       var res = await fetch(window.gasGetUrl('photos'));
       var json = await res.json();
       if(json && json.ok && Array.isArray(json.urls) && json.urls.length){
-        startBgRotation(json.urls);
+        startBgRotation(json.urls.map(function(u){ return u.replace(/=w\d+$/, '=w2400'); }));
       }
     }catch(e){ /* no saved photos yet, or network hiccup — default background stays */ }
   }
