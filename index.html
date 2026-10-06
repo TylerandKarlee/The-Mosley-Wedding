@@ -381,6 +381,8 @@
   .gate-status{min-height:20px; color:var(--wine); font-size:14px; margin-bottom:6px;}
   body.gate-locked #siteMain, body.gate-locked nav, body.gate-locked footer{display:none;}
   /* ---------- optional custom background photo (manager upload) ---------- */
+  .bg-fade-layer{position:absolute; inset:0; background-size:cover; background-position:center; background-repeat:no-repeat; opacity:0; pointer-events:none; z-index:0;}
+  .hero > *:not(.bg-fade-layer), #inviteGate > *:not(.bg-fade-layer){position:relative; z-index:1;}
   #inviteGate.has-photo, .hero.has-photo{background-size:cover; background-position:center; background-repeat:no-repeat;}
   #inviteGate.has-photo .gate-card h2, #inviteGate.has-photo .gate-card p{color:#FBF7EF;}
   #inviteGate.has-photo .gate-card input{background:var(--parchment); border-color:var(--parchment-line); color:var(--ink);}
@@ -1117,7 +1119,8 @@ window.gasPostBody = function(params){
   }
   gateSubmit.addEventListener('click', tryUnlock);
   gateInput.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ tryUnlock(); } });
-  var ROTATE_MS = 8000;
+  var ROTATE_MS = 9000;
+  var FADE_MS = 3000;
   var rotateTimer = null;
   function cssForPhoto(url){
     return 'linear-gradient(rgba(20,22,18,0.4), rgba(20,22,18,0.4)), url(' + url + ')';
@@ -1128,6 +1131,36 @@ window.gasPostBody = function(params){
     if(heroEl){ heroEl.style.backgroundImage = css; heroEl.classList.add('has-photo'); }
     if(gate){ gate.style.backgroundImage = css; gate.classList.add('has-photo'); }
   }
+  function getFadeLayer(el){
+    var layer = el.querySelector(':scope > .bg-fade-layer');
+    if(!layer){
+      layer = document.createElement('div');
+      layer.className = 'bg-fade-layer';
+      el.insertBefore(layer, el.firstChild);
+    }
+    return layer;
+  }
+  function crossfadeTo(url){
+    var css = cssForPhoto(url);
+    var img = new Image();
+    var go = function(){
+      var elems = [document.querySelector('.hero'), gate].filter(Boolean);
+      elems.forEach(function(el){
+        var layer = getFadeLayer(el);
+        layer.style.backgroundImage = css;
+        layer.style.transition = 'opacity ' + FADE_MS + 'ms ease-in-out';
+        layer.style.opacity = '1';
+        setTimeout(function(){
+          el.style.backgroundImage = css;
+          layer.style.transition = 'none';
+          layer.style.opacity = '0';
+        }, FADE_MS + 100);
+      });
+    };
+    img.onload = go;
+    img.onerror = go;
+    img.src = url;
+  }
   function startBgRotation(photos){
     if(rotateTimer){ clearInterval(rotateTimer); rotateTimer = null; }
     if(!photos || photos.length === 0) return;
@@ -1136,13 +1169,7 @@ window.gasPostBody = function(params){
     if(photos.length < 2) return;
     rotateTimer = setInterval(function(){
       idx = (idx + 1) % photos.length;
-      var heroEl = document.querySelector('.hero');
-      var elems = [heroEl, gate].filter(Boolean);
-      elems.forEach(function(el){ el.style.transition = 'opacity .8s ease'; el.style.opacity = '0.5'; });
-      setTimeout(function(){
-        applyBgPhotoNow(photos[idx]);
-        elems.forEach(function(el){ el.style.opacity = '1'; });
-      }, 800);
+      crossfadeTo(photos[idx]);
     }, ROTATE_MS);
   }
   window.applyBgPhoto = applyBgPhotoNow;
